@@ -1,0 +1,2 @@
+,win_rate,standard_error,n_wins,n_wins_base,n_draws,n_total,mode,avg_length
+checkpoints/llama7b_alpaca_None,0.0,0.0,0,8,0,8,community,1264
