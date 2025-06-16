@@ -11,10 +11,10 @@ which explicitly encourages the model to assign higher probability to desirable 
 
 Each training example contains the structure:
 
-* $d_{\text{instructions}}$
-* $d_{\text{data}}$ + $d_{\text{prefix}}$ (prefix is the optimized prompt suffix)
-* $d_{\text{desirable\_response}} \, y_w$
-* $d_{\text{undesirable\_response}} \, y_l$
+* $d_{instructions}$
+* $d_{data}$ + $d_{prefix}$ (prefix is the optimized prompt suffix)
+* $d_{desirable\_response} \, y_w$
+* $d_{undesirable\_response} \, y_l$
 
 For example:
 
@@ -97,6 +97,7 @@ advprompter/
 conda create -n advprompter python=3.11.4
 conda activate advprompter
 pip install -r requirements.txt
+export WANDB_MODE=offline
 ```
 **Fix Bug in environment CUDA version?**
 
@@ -134,9 +135,10 @@ print(torch.version.cuda)
 # 2.5.1+cu124
 # 12.4
 ```
-DownLoad `Llama-2-7b-hf` weights from huggingface: https://huggingface.co/meta-llama/Llama-2-7b-hf
-Pay attention to set your country as others instead of China and Russia when inputting in table, otherwise your account will be forbidden forever.
-
+DownLoad `Llama-2-7b-hf` weights from huggingface: https://huggingface.co/meta-llama/Llama-2-7b-hf.
+Pay attention to set your country as others instead of China and Russia when inputting in table, otherwise your account will be forbidden forever. (My first son has been already dead.)
+Download `Mistral-7B-v0.1` weights from huggingface: https://huggingface.co/mistralai/Mistral-7B-v0.1/tree/main.
+I choose `llama-2-7b-hf` as prompter and `mistral-chat` as target LLM.
 
 ### Quantitve Steps
 Focusing on `advprompter` module, it needs to be edited so that it can fit up my configuration.
@@ -160,4 +162,102 @@ Also fix up yaml files in `conf/` directory, including `conf/prompter/base_promp
 ```bash
 cd advprompter/
 python3 main.py --config-name=train target_llm=mistral_chat
+```
+
+My Loaders:
+```bash
+Initializing Prompter...
+ Loading model: llama2-7b from /home/cxx/AI-Agents/SecAlign/checkpoints/Llama-2-7b-hf...
+The `load_in_4bit` and `load_in_8bit` arguments are deprecated and will be removed in the future versions. Please, pass a `BitsAndBytesConfig` object in `quantization_config` argument instead.
+Loading checkpoint shards: 100%|████████████████████████████| 2/2 [00:02<00:00,  1.10s/it]
+ Loaded model: LlamaForCausalLM(
+  (model): LlamaModel(
+    (embed_tokens): Embedding(32000, 4096)
+    (layers): ModuleList(
+      (0-31): 32 x LlamaDecoderLayer(
+        (self_attn): LlamaSdpaAttention(
+          (q_proj): Linear4bit(in_features=4096, out_features=4096, bias=False)
+          (k_proj): Linear4bit(in_features=4096, out_features=4096, bias=False)
+          (v_proj): Linear4bit(in_features=4096, out_features=4096, bias=False)
+          (o_proj): Linear4bit(in_features=4096, out_features=4096, bias=False)
+          (rotary_emb): LlamaRotaryEmbedding()
+        )
+        (mlp): LlamaMLP(
+          (gate_proj): Linear4bit(in_features=4096, out_features=11008, bias=False)
+          (up_proj): Linear4bit(in_features=4096, out_features=11008, bias=False)
+          (down_proj): Linear4bit(in_features=11008, out_features=4096, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): LlamaRMSNorm((4096,), eps=1e-05)
+        (post_attention_layernorm): LlamaRMSNorm((4096,), eps=1e-05)
+      )
+    )
+    (norm): LlamaRMSNorm((4096,), eps=1e-05)
+    (rotary_emb): LlamaRotaryEmbedding()
+  )
+  (lm_head): Linear(in_features=4096, out_features=32000, bias=False)
+)
+ Mem usage model: 3.92 GB | Total Mem usage: 3.92 GB
+ Transforming to LoRA model...
+ trainable params: 4483072 || all params: 3504896000 || trainable%: 0.13
+Initializing TargetLLM...
+ Loading model: Mistral-7B-v0.1 from /home/cxx/AI-Agents/StruQ/checkpoints/Mistral-7B-v0.1...
+The `load_in_4bit` and `load_in_8bit` arguments are deprecated and will be removed in the future versions. Please, pass a `BitsAndBytesConfig` object in `quantization_config` argument instead.
+Loading checkpoint shards: 100%|███████████████████████████| 2/2 [07:17<00:00, 218.54s/it]
+ Loaded model: MistralForCausalLM(
+  (model): MistralModel(
+    (embed_tokens): Embedding(32000, 4096)
+    (layers): ModuleList(
+      (0-31): 32 x MistralDecoderLayer(
+        (self_attn): MistralSdpaAttention(
+          (q_proj): Linear4bit(in_features=4096, out_features=4096, bias=False)
+          (k_proj): Linear4bit(in_features=4096, out_features=1024, bias=False)
+          (v_proj): Linear4bit(in_features=4096, out_features=1024, bias=False)
+          (o_proj): Linear4bit(in_features=4096, out_features=4096, bias=False)
+          (rotary_emb): MistralRotaryEmbedding()
+        )
+        (mlp): MistralMLP(
+          (gate_proj): Linear4bit(in_features=4096, out_features=14336, bias=False)
+          (up_proj): Linear4bit(in_features=4096, out_features=14336, bias=False)
+          (down_proj): Linear4bit(in_features=14336, out_features=4096, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): MistralRMSNorm((4096,), eps=1e-05)
+        (post_attention_layernorm): MistralRMSNorm((4096,), eps=1e-05)
+      )
+    )
+    (norm): MistralRMSNorm((4096,), eps=1e-05)
+  )
+  (lm_head): Linear(in_features=4096, out_features=32000, bias=False)
+)
+ Mem usage model: 4.13 GB | Total Mem usage: 8.06 GB
+ Freezing model...
+ trainable params: 0 || all params: 3752071168 || trainable%: 0.00
+```
+
+### DataSets
+Only a useless `prompt_injected_prefixes.csv` in data to be the injection keywords and you can enhance it by yourself.
+- [AlpacaFarm](https://huggingface.co/datasets/tatsu-lab/alpaca_farm/tree/main/alpaca_instructions)
+- [Cleaned Alpaca](https://huggingface.co/datasets/yahma/alpaca-cleaned/tree/main)
+
+This repo does not provide the dataset, but the details can be extracted from paper: it mainly use two datasets, `AlpacaFarm` and `Cleaned Alpaca`, which are responsible for constructing CSV dataset in training and testing phases (through convert json format to csv format).
+What's more, code review can tell us that CSV dataset contains 3 items: "instruct", "target" and "suffix".    
+So we can construct our dataset by following codes:
+```python
+type_K = "unlabeled"
+json_file_path = f"advprompter/data/prompt_injections/raw/{type_K}.json"
+with open(json_file_path, "r", encoding="utf-8") as json_file:
+    data = json.load(json_file)
+
+# 写入 CSV 文件（评估数据）
+csv_file_path = f"advprompter/data/prompt_injections/dataset/test_data_{type_K}.csv"
+with open(csv_file_path, "w", newline="", encoding="utf-8") as csv_file:
+    csv_writer = csv.writer(csv_file)
+    csv_writer.writerow(["instruct", "target", "suffix"])  # 写入表头
+    for item in data:
+        instruct = item.get("instruction", "")
+        target = item.get("output", "")
+        suffix = item.get("input", "")  # 使用 input 作为 suffix
+        csv_writer.writerow([instruct, target, suffix])
+print("CSV file written successfully!")
 ```

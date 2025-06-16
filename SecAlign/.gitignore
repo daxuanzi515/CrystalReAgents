@@ -1,7 +1,6 @@
 __pycache__
 wandb
 /data
-advprompter/exp
 core.*
 huggyllama
 mistralai
@@ -12,3 +11,8 @@ CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 LICENSE
 README.md
+advprompter/__pycache__
+advprompter/exp
+advprompter/wandb
+advprompter/checkpoints
+

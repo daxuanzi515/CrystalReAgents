@@ -4,7 +4,7 @@ defaults:
 
 llm_params:
   model_name: "llama2-7b"
-  checkpoint: 'checkpoints/Llama-2-7b-hf' # or replace with local DIR
+  checkpoint: '/home/cxx/AI-Agents/SecAlign/checkpoints/Llama-2-7b-hf' # or replace with local DIR
   lora_params:
     warmstart: false
     lora_checkpoint: null #exp/local/2024.07.04/043448_mistral-none/checkpoints/step_2100
