@@ -1,0 +1,44 @@
+FROM ubuntu:latest
+
+# 安装必要的包
+RUN apt-get update && apt-get install -y sudo bash wget
+
+# 检查用户是否存在，如果不存在则创建
+RUN if ! id "user" &> /dev/null; then \
+    useradd -m -s /bin/bash user && \
+    passwd -d user && \
+    echo "user ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo; \
+    sed -i '/user ALL=(ALL) NOPASSWD: ALL/d' /etc/sudoers; \
+    fi
+
+# 安装 Miniconda
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \
+    /bin/bash /tmp/miniconda.sh -b -p /opt/conda && \
+    rm /tmp/miniconda.sh && \
+    /opt/conda/bin/conda init bash
+
+# 设置环境变量
+ENV PATH="/opt/conda/bin:$PATH"
+
+# 切换到用户目录
+USER user
+WORKDIR /home/user/
+
+# 将项目代码和数据集复制到容器中
+COPY . /home/user/
+
+# 创建 Conda 环境
+RUN /bin/bash -c "source /opt/conda/etc/profile.d/conda.sh && \
+    conda create -n AGrail python=3.9 -y"
+    
+# 将激活环境的命令写入 .bashrc
+RUN echo "source /opt/conda/etc/profile.d/conda.sh" >> /home/user/.bashrc && \
+    echo "conda activate AGrail" >> /home/user/.bashrc
+
+# 设置默认用户
+USER user
+
+# 设置默认工作目录
+WORKDIR /home/user/
+
+CMD ["/bin/bash"]
