@@ -1,0 +1,12 @@
+llm_params:
+  device: 'cuda:0'
+  freeze: true
+  dtype: float16
+  lora_params: null
+  load_in_4bit: true
+  bnb_4bit_use_double_quant: true
+  bnb_4bit_quant_type: "nf4"
+allow_non_ascii: true
+gen_params:
+  max_new_tokens: 150
+  do_sample: false

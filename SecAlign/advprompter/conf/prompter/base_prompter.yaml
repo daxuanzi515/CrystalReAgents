@@ -1,0 +1,21 @@
+# llm_params:
+#   device: 'cuda:1'
+#   freeze: false
+#   dtype: float32
+# allow_non_ascii: false
+# gen_params:
+#   do_sample: true
+#   temperature: 1.0
+#   top_p: 0.9
+
+llm_params:
+  device: 'cuda:0' 
+  freeze: false
+  dtype: float16
+  load_in_4bit: true
+  bnb_4bit_use_double_quant: true
+  bnb_4bit_quant_type: "nf4"
+allow_non_ascii: true  # 视需要
+gen_params:
+  max_new_tokens: 150
+  do_sample: false
