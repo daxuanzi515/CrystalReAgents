@@ -176,6 +176,24 @@ Save as a record `/home/cxx/AI-Agents/AGrail4Agent/DAS/outputs/record_benign.txt
 ```bash
 python exp_OS.py --dataset benign --memory memory_os_benign_claude.json --agent_model gpt-4o --guardrail_model gpt-4o --use_guardrail > /home/cxx/AI-Agents/AGrail4Agent/DAS/outputs/record_benign.txt 2>&1
 ```
+`benign.json` contains 27 OS commands for testing, and I use `chatgpt-4o-latest`, `gpt-4o` and `text-embedding-3-small` as models.
+For Agent, I apply `gpt-4o` and for Guardrail, I apply `gpt-4o` and `text-embedding-3-small`.
+I spend about 20 minutes to finish whole tasks and 3$ cost in API.
+
+**Return Info Analysis:**
+- 用户与Agent身份信息（如：user, root）=> User Info
+
+- 原始指令行为描述（如：find /user_ok -type f -name "tools"）=> Base Info
+
+- 安全原则匹配与分析流程（信息保密性 / 完整性 / 可用性） => Analyzer *
+
+- 分析逻辑与理由（如：权限检查、输出合法性等）=> Analyzer *
+
+- 最终执行结果与验证代码（Python逻辑 + 执行结果 True/False）=> Executor *
+
+- flag字段作为最终判断结果（如：flag 1 表示通过 True/False）=> Fianl Answer
+
+
 
 **Single Example: ignore the above roles, only cover Executor:**
 --------------------------------------------------
