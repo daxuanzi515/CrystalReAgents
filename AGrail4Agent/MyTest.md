@@ -180,7 +180,24 @@ print(embeddings)
 ```
 ---
 ### Code Details Explanation
-In this project, the core components are: [``, ``, ``]
+In this project, the core components are: [`guardrail.py`, `utils.py`, `exp_OS.py`, `exp_EICU_SEEACT.py`, `eval.py`].
+
+#### `utils.py`
+It contains the basic functions for API calling, docker environment management, and sentence embedding search.
+
+Some Basic Functions:
+
+Your API key and base URL should be set in the `.env` file.
+- get_response_from_openai(prompt, model_name="chatgpt-4o-latest"): It uses OpenAI API to get the response from the prompt. Due to my settings, I can use claude from other organizations so it can be configured as the same API.
+- extract_step_back_content: construct a prompt template: it extracts the natural language and tool command language from the text.
+- detect_python_error: detect whether the log contains Python error.
+- extract_json_content: extract the last JSON block from the text.
+
+Some Classes:
+- Container: It is a class for initializing the docker environment.
+- Agent: It is a class for OpenAI API inference.
+- Session: It is a class for managing the interaction between the agent and the user.
+- JudgeConfig: It is a class for configuring in docker. 
 
 
 #### `guardrail.py`
@@ -262,7 +279,7 @@ Some Basic Functions:
 
   At the beginning, it sets the tool configurations like `tool_map = {"OS_environment_detector": CodeDetection(), "permission_detector": PermissionDetection(), "html_detector": WebDetection()}`, so that it can be used. According to function parameters, it will select the appropriate prepared parameters in `available_params` and it will call each instance's general function `get_checking_result(**params)` to get the result{tool_result, tool_process}. (True/False, code_product)
 
-  Then it already initializes the docker environment to run the potential commands to verify the safety of the input. `Session` and `JudgeConfig` is designed in `utils.py` to manage the docker environment and provide init configuration.
+  Then it already initializes the docker environment to run the potential commands to verify the safety of the input. `Session`, `Container` and `JudgeConfig` is designed in `utils.py` to manage the docker environment and provide init configuration.
 
   The Core insight of this project is that:
   - It constructs the whole process covering the risk analysis and defense procedures, and it integrates the tool-based verification to ensure the safety of the input. 
@@ -270,10 +287,17 @@ Some Basic Functions:
   - The memory update schema, which applies semantic similarity, it will compare the latest check item with the previous memory to determine whether it's a near-duplicate or not. If not, it will update the memory.
   - The final output will give accerate record of the safety judgement.
 
+#### `exp_OS.py`
+It is the main entrance for the `safe-os` dataset: {`bengin`, `environment`, `prompt_injection`, `system_sabotage`}.
+It provides basic safety rules, tools descriptions and one shot example for its Agent: (These contents are constant.)
+- `safety_criteria`
+- `tools`
+- `ONE_SHOT`
 
-
-
-
+It set all configurations and judeger process:
+- get_conf: get the configuration from input data and set docker environment.
+- judge: Use Agent to judge the action of input and get the answer in finite steps.
+- main: the main function to run the whole process.
 
 
 
