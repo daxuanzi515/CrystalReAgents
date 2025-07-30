@@ -1,0 +1,10 @@
+src/gen_content/MiniLM-L6-v2
+src/gen_content/log
+src/gen_content/__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.cache
+.vscode
+.idea
